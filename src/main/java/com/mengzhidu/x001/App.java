@@ -10,7 +10,6 @@ import java.nio.channels.FileChannel;
  */
 public class App {
     public static void main(String[] args) throws Exception {
-        //System.out.println(System.getProperty("user.dir"));
         String path = "src/main/resources/demo1.txt";
         FileInputStream inputStream = new FileInputStream(path);
         FileChannel fileChannel = inputStream.getChannel();
