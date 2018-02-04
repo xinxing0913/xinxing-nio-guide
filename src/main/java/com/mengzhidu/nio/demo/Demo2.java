@@ -5,33 +5,44 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * 如果我们一次读不完，那么该怎么办呢
- * 我们可以读取多次，然后
+ * 以ByteBuffer为例
+ * 探究一下Buffer类的一些具体操作
  */
 public class Demo2 {
     public static void main(String[] args) throws Exception{
         String path = "src/main/resources/demo02.txt";
-        FileInputStream inputStream = new FileInputStream(path);
-        // 获取指定文件的通道
-        FileChannel inputChannel = inputStream.getChannel();
+        // 得到特定文件的通道
+        FileChannel fileChannel = new FileInputStream(path).getChannel();
+        // 申请100个字节大小的字节缓存区
+        ByteBuffer buffer = ByteBuffer.allocate(100);
+        System.out.println("在读取数据前缓冲区的capcity:" + buffer.capacity());
+        System.out.println("在读取数据前缓冲区的limit:" + buffer.limit());
+        System.out.println("在读取数据前缓冲区的position:" + buffer.position());
+        System.out.println();
+        // 读取文件内容
+        int length = fileChannel.read(buffer);
+        System.out.println("在读取数据后缓冲区的capcity:" + buffer.capacity());
+        System.out.println("在读取数据后缓冲区的limit:" + buffer.limit());
+        System.out.println("在读取数据后缓冲区的position:" + buffer.position());
+        System.out.println();
 
-        // 我们申请的缓冲区尽量小一些
-        ByteBuffer byteBuffer = ByteBuffer.allocate(32);
+        // 读取的数据内容
+        System.out.println("读取的长度:" + length);
+        System.out.println("读取的内容: " + new String(buffer.array()));
+        System.out.println();
 
-        while (true) {
-            // 从通道中读取数据
-            int n =  inputChannel.read(byteBuffer);
-            // 读取结束，直接跳出
-            if (n == -1) {
-                break;
-            }
-            // 重置位置
-            byteBuffer.clear();
+        // 清空数据
+        buffer.clear();
+        System.out.println("在清空数据后缓冲区的capcity:" + buffer.capacity());
+        System.out.println("在清空数据后缓冲区的limit:" + buffer.limit());
+        System.out.println("在清空数据后缓冲区的position:" + buffer.position());
+        System.out.println();
 
-            // 输出获取到的数据内容
-            byte[] bytes = byteBuffer.array();
-            System.out.println("读取的长度:" + n + " 内容:" + new String(bytes, 0, n ));
-        }
+        // 需要说明的是
+        // 这里的数据并没有被释放
+        System.out.println("在clear后数据是:" + new String(buffer.array()));
 
+        // 关闭通道
+        fileChannel.close();
     }
 }
